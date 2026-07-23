@@ -151,6 +151,10 @@ pontualidade, produtividade, re-otimização, consumo de créditos, comparativos
 | D5 | **Início/fim NÃO são definidos pelo usuário** — ele só adiciona pontos; o app determina a ordem completa (1ª parada = início, última = fim). Rota não guarda `ponto_inicio`/`ponto_fim` como entrada | Alinha ao produto: o usuário despeja os pontos e o otimizador ordena tudo (G2). Segue pendência G2b (partida = localização do motorista?) para o Sprint 6. |
 | D6 | `Parada.ordem_original` (ordem de inserção) armazenada | Baseline para o relatório "tempo economizado" (8.5 / G3). |
 | D7 | ORM = **Drizzle** | TS-first, migrations, DX; PostGIS via SQL bruto quando preciso (G4). |
+| D8 | Sessão = **JWT** (access 15min + refresh revogável, cookie httpOnly) | Padrão para mobile+web; revogação via lista de refresh. |
+| D9 | Login social via **SocialAuthVerifier** (interface); mock agora, Google/Apple plugáveis por env | Sprint 2 testável sem client IDs; troca sem mexer na lógica. |
+| D10 | Envio de e-mail via **EmailProvider** (interface); adapter log/mock agora, SMTP depois | Verificação de e-mail e reset testáveis sem provedor real. |
+| D11 | Exclusão de conta (G7) = **anonimizar PII + soft-delete** (`deleted_at`) | Direito LGPD preservando integridade referencial. |
 
 **Modelo líder por sprint:** S0/S1/S2/S6/S13 → Opus · S3-S5/S7-S12/S14-S16 → Sonnet ·
 UI (mobile/web) dentro de cada sprint → Fable 5 · ads (S10) → Haiku.

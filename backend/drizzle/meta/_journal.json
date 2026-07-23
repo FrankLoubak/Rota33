@@ -15,6 +15,13 @@
       "when": 1784826012525,
       "tag": "0001_postgis_geog",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784827235770,
+      "tag": "0002_perfect_mister_sinister",
+      "breakpoints": true
     }
   ]
 }
