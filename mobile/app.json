@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Rota33",
+    "slug": "rota33",
+    "scheme": "rota33",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.rota33.app",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Usado para registrar o trajeto durante a execução da rota.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Rastreamento do trajeto em segundo plano apenas enquanto a rota está em andamento.",
+        "NSCameraUsageDescription": "Fotografar endereços para extração automática (OCR).",
+        "NSMicrophoneUsageDescription": "Ditar endereços por voz."
+      }
+    },
+    "android": {
+      "package": "com.rota33.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "CAMERA",
+        "RECORD_AUDIO"
+      ]
+    }
+  }
+}
