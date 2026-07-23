@@ -20,3 +20,4 @@ export const rotaStatusEnum = pgEnum("rota_status", ["planejamento", "em_andamen
 export const paradaOrigemEnum = pgEnum("parada_origem", ["manual", "foto", "voz"]);
 export const paradaStatusEnum = pgEnum("parada_status", ["pendente", "concluida", "pulada"]);
 export const prioridadeEnum = pgEnum("prioridade", ["baixa", "media", "alta"]);
+export const emailTokenTipoEnum = pgEnum("email_token_tipo", ["verificacao", "reset"]);

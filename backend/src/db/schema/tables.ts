@@ -23,6 +23,7 @@ import {
   assinaturaStatusEnum,
   assinaturaTierEnum,
   carteiraOrigemEnum,
+  emailTokenTipoEnum,
   paradaOrigemEnum,
   paradaStatusEnum,
   prioridadeEnum,
@@ -44,11 +45,34 @@ export const usuarios = pgTable("usuarios", {
   email: text("email").notNull().unique(),
   senhaHash: text("senha_hash"), // nulo se login social
   provedorLogin: provedorLoginEnum("provedor_login").notNull().default("email"),
+  emailVerificado: boolean("email_verificado").notNull().default(false),
   dataCadastro: timestamp("data_cadastro", { withTimezone: true }).notNull().defaultNow(),
   idiomaPreferido: text("idioma_preferido").notNull().default("pt-BR"),
   pais: text("pais").notNull().default("BR"),
   ...timestamps(),
-  deletedAt: timestamp("deleted_at", { withTimezone: true }), // exclusão/anonimização (G7)
+  deletedAt: timestamp("deleted_at", { withTimezone: true }), // exclusão/anonimização (G7, D11)
+});
+
+// ── Refresh tokens (sessão JWT — D8) ─────────────────────────────────────────
+export const refreshTokens = pgTable("refresh_tokens", {
+  id: pk(),
+  idUsuario: uuid("id_usuario").notNull().references(() => usuarios.id),
+  tokenHash: text("token_hash").notNull(), // hash do refresh token (nunca em claro)
+  claims: text("claims"), // snapshot json das claims (re-emissão no /refresh)
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ── Email tokens (verificação de e-mail e reset de senha — D10) ──────────────
+export const emailTokens = pgTable("email_tokens", {
+  id: pk(),
+  idUsuario: uuid("id_usuario").notNull().references(() => usuarios.id),
+  tipo: emailTokenTipoEnum("tipo").notNull(),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  consumedAt: timestamp("consumed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ── Assinatura ───────────────────────────────────────────────────────────────
