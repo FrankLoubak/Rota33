@@ -1,0 +1,54 @@
+# ─── Rota33 — Elaborador de Rotas ───────────────────────────────
+# Monorepo: backend (Node/Express) + web (React/Vite) + mobile (React Native/Expo)
+
+# Dependências
+node_modules/
+.pnp
+.pnp.*
+
+# Ambiente / segredos (NUNCA versionar)
+.env
+.env.*
+!.env.example
+!.env.prod.example
+
+# Builds / saída
+dist/
+build/
+web-build/
+*.tsbuildinfo
+
+# Expo / React Native
+.expo/
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+ios/
+android/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-*.log*
+
+# Cache / coverage
+.cache/
+.vite/
+coverage/
+.eslintcache
+
+# Banco / geo
+*.sqlite
+*.dump
+
+# Editores / SO
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
