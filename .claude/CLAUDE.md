@@ -144,7 +144,7 @@ pontualidade, produtividade, re-otimização, consumo de créditos, comparativos
 
 | # | Decisão | Justificativa |
 |---|---|---|
-| D1 | Isolamento dev/prod na mesma VPS: **a definir** (containers/bancos lógicos separados) pelo database/backend-agent no Sprint 0 | Dev e prod compartilham a VPS Hostinger. |
+| D1 | Isolamento dev/prod: **containers/bancos separados** (dev = `rota33_postgis_dev`, host 5442; prod definido no Sprint 15). Isolamento de dados **por `id_usuario` na camada de query** (app B2C, **sem RLS**) | Dev e prod compartilham a VPS; app é B2C (não multi-tenant), dispensa RLS. |
 | D2 | Trabalhar **apenas local** (`~/Rota33`) até o deploy; infra só com confirmação explícita | Segurança de produção; regra 0.3. |
 | D3 | Modelo de IA por agente (matriz 2.1); Fable 5 na UI validado por benchmark | Melhor custo/qualidade por tipo de tarefa. |
 | D4 | **GeocodingProvider** desacoplado: Nominatim/OSM (padrão, todos) + Google Geocoding (premium, assinantes) | Endereço→lat/lng é essencial e faltava; espelha o RoutingProvider (G1). |
