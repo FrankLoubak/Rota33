@@ -5,9 +5,11 @@
  */
 import cookieParser from "cookie-parser";
 import express from "express";
+import { authenticate } from "./http/middleware/authenticate";
 import { errorHandler } from "./http/middleware/errors";
 import { makeGlobalLimiter, type RateLimitOverrides } from "./http/middleware/rateLimit";
 import { authRouter } from "./http/routes/auth";
+import { rotasRouter } from "./http/routes/rotas";
 
 export function createApp(opts: { rateLimit?: RateLimitOverrides } = {}) {
   const app = express();
@@ -19,6 +21,7 @@ export function createApp(opts: { rateLimit?: RateLimitOverrides } = {}) {
   app.get("/health", (_req, res) => res.json({ status: "ok", service: "rota33-backend" }));
 
   app.use("/auth", authRouter(opts.rateLimit));
+  app.use("/rotas", authenticate, rotasRouter());
 
   app.use(errorHandler);
   return app;

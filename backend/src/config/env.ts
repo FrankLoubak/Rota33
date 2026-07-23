@@ -32,4 +32,6 @@ export const config = {
     globalMax: num("RL_GLOBAL_MAX", 1000),
   },
   emailProvider: process.env.EMAIL_PROVIDER ?? "log", // D10
+  geocodingProvider: process.env.GEOCODING_PROVIDER ?? "mock", // D4 (mock | nominatim | google)
+  nominatimUrl: process.env.NOMINATIM_URL ?? "https://nominatim.openstreetmap.org",
 };
