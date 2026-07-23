@@ -9,8 +9,9 @@
 | 0 — Setup + `.claude/` + matriz de modelos | ✅ no `main` |
 | 1 — Modelo de dados (Drizzle + PostGIS) | ✅ no `main` |
 | 2 — Auth (e-mail/senha + social + JWT) | ✅ no `main` |
-| 3 — CRUD Rota/Parada + geocoding + telas | 🔄 **BREAKPOINT** — retomar aqui (ver abaixo) |
-| 4-16 | ⏳ |
+| 3 — CRUD Rota/Parada + geocoding + telas | ✅ no `main` (PR #5 — 17 testes backend + 7 web) |
+| 4 — OCR de endereços | 🔄 **BREAKPOINT** — retomar aqui (ver abaixo) |
+| 5-16 | ⏳ |
 
 ## Ambiente para retomar
 - Backend: `~/Rota33/backend` (Node+Express+Drizzle). `npm test` usa o PostGIS de dev.
@@ -18,6 +19,7 @@
   `docker compose -f docker-compose.dev.yml up -d postgis-dev`. Descartar: `... down -v`.
 - Web: `~/Rota33/web` (React+Vite). Mobile: `~/Rota33/mobile` (Expo, ainda sem `npm install`).
 - Migrations até **0002**. Backend/web já com deps instaladas; mobile não.
+- Testes: backend `npm test` (17 verdes), web `npm test` (7 verdes).
 
 ## Modelo de IA por agente (matriz — trocar `/model` por sprint)
 - **Fable 5**: UI (mobile-agent, web-agent) — validado por benchmark.
@@ -37,39 +39,49 @@ D10 EmailProvider (log/mock) · D11 exclusão = anonimizar+soft-delete.
 - Definições de monetização (S10): gateway, rede de anúncios, tiers/limites, preço avulso.
 - VoiceInputProvider (S5); credenciais reais (Google/Apple/e-mail/mapas) quando integrar.
 
-## ⏸️ BREAKPOINT — Sprint 3 UI (retomar aqui)
+## ⏸️ BREAKPOINT — Sprint 4: OCR de endereços (retomar aqui)
 
-**Branch**: `feat/sprint-3-crud-rota-parada`  
-**Último commit**: `a25ac6a` — web UI foundation commitada.
+**Branch a criar**: `feat/sprint-4-ocr`  
+**Base**: `main` tip `8f59697`
 
-### O que está pronto (NÃO refazer)
-| Arquivo | Status |
-|---|---|
-| `backend/` inteiro — CRUD Rota/Parada + GeocodingProvider | ✅ 17 testes verdes |
-| `web/src/api/client.ts` | ✅ commitado |
-| `web/src/api/types.ts` | ✅ commitado |
-| `web/src/auth/AuthContext.tsx` | ✅ commitado |
-| `web/src/components/ui.tsx` | ✅ commitado |
-| `web/src/i18n/index.ts` | ✅ commitado |
-| `web/src/styles.css` | ✅ commitado |
+### Sprint 4 — O que fazer
+O plano original prevê captura de endereços por foto (OCR). Segue a mesma lógica das providers anteriores:
 
-### O que falta implementar (Sprint 3 UI)
-1. `web/src/pages/LoginPage.tsx` — formulário e-mail/senha + botão social mock
-2. `web/src/pages/RotasPage.tsx` — listagem + botão "Nova Rota"
-3. `web/src/pages/RotaDetalhePage.tsx` — paradas + componente AdicionarParada (endereço, janela, prioridade, pacote)
-4. `web/src/App.tsx` — roteamento React Router + ProtectedRoute + AuthProvider
-5. `web/vite.config.ts` — proxy `/api` → `localhost:3000` + setup Testing Library
-6. `web/src/__tests__/rotas.web.test.tsx` — testes de integração (mock MSW ou direto com test-server)
-7. PR #5 + merge em `main`
+1. **`OcrProvider` interface** (`backend/src/providers/ocr/index.ts`)
+   - Método: `extractText(imageBase64: string): Promise<string>`
+   - Mock: retorna texto fixo determinístico (sem I/O)
+   - Adapter real: Google Vision API (stub — lança erro até credencial configurada)
+   - Factory por `config.ocrProvider` (`"mock" | "google-vision"`)
 
-### Modelo para UI
-Fable 5 teve erro de API; sessão parada. Ao retomar, tentar novamente com **Fable 5** (benchmark confirmou melhor para UI). Se voltar a dar erro, usar **Sonnet 4.6** como fallback (não há diferença de qualidade crítica nesta fase).
+2. **Tabela `capturas_ocr`** (já existe no schema — ver `tables.ts`)
+   - Campos: `id`, `id_usuario`, `id_parada` (nullable), `imagemUrl`, `textoExtraido`, `criadoEm`
+   - G8 pendente: onde armazenar a imagem (S3, base64 inline ou URL externa)?
+     → **Decisão sugerida**: base64 inline no campo `imagemUrl` para simplificar (sem infra extra); limitar a 1MB por imagem.
+
+3. **`ocrService`** (`backend/src/services/ocrService.ts`)
+   - `processarCaptura(idUsuario, imageBase64, idParada?)` — chama provider, persiste em `capturas_ocr`, retorna texto
+
+4. **Rota REST** `POST /ocr/captura` (autenticada)
+   - Body: `{ imageBase64: string, idParada?: string }`
+   - Resposta: `{ id, textoExtraido }`
+
+5. **Web**: botão "Usar foto" na `RotaDetalhePage` — abre `<input type="file" accept="image/*">`, converte para base64, chama `/ocr/captura`, preenche campo de endereço automaticamente
+
+6. **Testes**: mock provider; 3 testes (extração ok, parada vinculada, rota sem auth)
+
+### Pendência a resolver antes de codar (G8)
+Confirmar estratégia de storage da imagem. Sugestão acima (base64 inline, limite 1MB) pode ser aceita sem discussão — só mencionar ao usuário ao iniciar.
 
 ### Subir o ambiente antes de continuar
 ```bash
 docker compose -f ~/Rota33/docker-compose.dev.yml up -d postgis-dev
-cd ~/Rota33/backend && npm test   # confirmar 17 testes verdes
+cd ~/Rota33/backend && npm test   # deve ter 17 testes verdes
+cd ~/Rota33/web && npm test       # deve ter 7 testes verdes
 ```
+
+### Modelo para Sprint 4
+- Backend + provider: **Sonnet 4.6**
+- Web (botão foto): **Sonnet 4.6** (ou tentar Fable 5 se quiser)
 
 ---
 
